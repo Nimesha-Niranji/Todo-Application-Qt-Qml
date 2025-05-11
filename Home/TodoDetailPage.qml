@@ -107,16 +107,40 @@ Page {
             spacing: 20
 
             Button {
+                id: deleteButton
                 text: "Delete"
+
                 onClicked: {
-                    const url = "http://localhost:8000/todo/" + todoDetailModel.id + "/"
-                    ADMIN_JS.deleteItem(url, authToken, function() {
-                        if (typeof onRefresh === "function") onRefresh()
-                        if (stackViewRef) stackViewRef.clear()
-                    })
-                    todoDetailPage.deleteItem(index)
+                    logoutDialog.open()
+                }
+
+                Dialog {
+                    id: logoutDialog
+                    modal: true
+                    title: "Confirm Delete"
+                    standardButtons: Dialog.Yes | Dialog.Cancel
+                    visible: false
+                    onAccepted: {
+                        const url = "http://localhost:8000/todo/" + todoDetailModel.id + "/"
+                        ADMIN_JS.deleteItem(url, authToken, function() {
+                            if (typeof onRefresh === "function") onRefresh()
+                            if (stackViewRef) stackViewRef.clear()
+                        })
+                        todoDetailPage.deleteItem(index)
+                    }
+                    onRejected: {
+                        // Just close the dialog
+                        logoutDialog.close()
+                    }
+
+                    contentItem: Text {
+                        text: "Are you sure you want to delete?"
+                        wrapMode: Text.Wrap
+                        padding: 10
+                    }
                 }
             }
+
 
             Button {
                 text: "Edit"

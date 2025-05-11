@@ -19,5 +19,6 @@
         <file>Home/UserDetailPage.qml</file>
         <file>Image/delete.png</file>
         <file>Image/update.png</file>
+        <file>Image/logout.png</file>
     </qresource>
 </RCC>

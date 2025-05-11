@@ -142,20 +142,58 @@ ColumnLayout {
             }
 
             Button {
+                id: deleteButton
                 height: 70
                 width: 70
                 background: null
-                onClicked: function() {
-                    listAddSection.deleteItem(index)
-                }
-
                 Image {
 
                     anchors.fill: parent
                     source: "qrc:/Image/delete.png"
                     fillMode: Image.PreserveAspectFit
                 }
+
+                onClicked: {
+                    logoutDialog.open()
+                }
+
+                Dialog {
+                    id: logoutDialog
+                    modal: true
+                    title: "Confirm Delete"
+                    standardButtons: Dialog.Yes | Dialog.Cancel
+                    visible: false
+                    onAccepted: {
+                        listAddSection.deleteItem(index)
+                    }
+                    onRejected: {
+                        // Just close the dialog
+                        logoutDialog.close()
+                    }
+
+                    contentItem: Text {
+                        text: "Are you sure you want to delete?"
+                        wrapMode: Text.Wrap
+                        padding: 10
+                    }
+                }
             }
+
+            // Button {
+            //     height: 70
+            //     width: 70
+            //     background: null
+            //     onClicked: function() {
+            //         listAddSection.deleteItem(index)
+            //     }
+
+            //     Image {
+
+            //         anchors.fill: parent
+            //         source: "qrc:/Image/delete.png"
+            //         fillMode: Image.PreserveAspectFit
+            //     }
+            // }
         }
     }
 

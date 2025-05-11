@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls
 import QtQuick.Window
+import QtQuick.Dialogs
 //import QtQuick.Controls.Basic
 //import QtQuick.Layouts
 
@@ -11,6 +12,13 @@ Window {
     width: 500
     height: 600
     title: qsTr("To Do Application")
+
+    MessageDialog {
+        id: messageBox
+        title: "Notice"
+        buttons: MessageDialog.Ok
+        text: ""
+    }
 
     property string userRole: ""
     property string userDepartment: ""

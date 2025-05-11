@@ -33,26 +33,6 @@ Page {
     property string currentUserLogin: ""
     property string currentUserDepartment: ""
 
-    function filterMyTodos() {
-        console.log("currentUserLogin =", currentUserLogin)
-
-        myTodoModel.clear()
-        for (let i = 0; i < todoModel.count; i++) {
-            let todo = todoModel.get(i)
-
-            // Access the login (username) from the related TodoUser object
-            let todoLogin = todo.todo_user.login.name  // Assuming `todo.todo_user` is an object with `login` being a ForeignKey to the User model
-
-            console.log("Comparing todoLogin:", todoLogin, "with currentUserLogin:", currentUserLogin)
-
-            if (todoLogin === currentUserLogin) {
-                myTodoModel.append(todo)
-            } else {
-                console.log("Skipping todo:", JSON.stringify(todo))
-            }
-        }
-    }
-
     function findItemById(model, id) {
         for (let i = 0; i < model.count; i++) {
             let item = model.get(i);
@@ -87,11 +67,9 @@ Page {
     Component.onCompleted: {
         console.log(userRole)
         if (authToken !== "") {
-            // fetchAndFill("http://127.0.0.1:8000/todo/user/unregistered/", loginModel)
-            // fetchAndFill("http://127.0.0.1:8000/todo/department/", departmentModel)
-            // fetchAndFill("http://127.0.0.1:8000/todo/role/", roleModel)
             fetchAndFill("http://127.0.0.1:8000/todo/list/", todoModel)
             fetchAndFill("http://127.0.0.1:8000/todo/user/", userModel)
+            fetchAndFill("http://127.0.0.1:8000/todo/list/manager/own/", myTodoModel)
         }
     }
 
@@ -113,11 +91,34 @@ Page {
             ListModel { id: departmentTodoModel }
 
             Button {
+                id: logoutButton
                 text: "Logout"
                 anchors.right: managerBox.right
                 anchors.top: managerBox.top
+
                 onClicked: {
-                    LOGIN_JS.logout(authToken, stackViewRef)
+                    logoutDialog.open()
+                }
+
+                Dialog {
+                    id: logoutDialog
+                    modal: true
+                    title: "Confirm Logout"
+                    standardButtons: Dialog.Yes | Dialog.Cancel
+                    visible: false
+                    onAccepted: {
+                        LOGIN_JS.logout(authToken, stackViewRef)
+                    }
+                    onRejected: {
+                        // Just close the dialog
+                        logoutDialog.close()
+                    }
+
+                    contentItem: Text {
+                        text: "Are you sure you want to logout?"
+                        wrapMode: Text.Wrap
+                        padding: 10
+                    }
                 }
             }
 
@@ -201,7 +202,6 @@ Page {
                         verticalAlignment: Text.AlignVCenter
                     }
                     onClicked: {
-                        filterMyTodos()
                         sectionView.currentIndex = 3
                     }
                 }
@@ -399,6 +399,7 @@ Page {
                         }
 
                     }
+
                 }
 
                 Rectangle{
@@ -652,7 +653,7 @@ Page {
                                     MouseArea {
                                         anchors.fill: parent
                                         onClicked: {
-                                            ADMIN_JS.refreshModel("http://127.0.0.1:8000/todo/list/", todoModel, authToken)
+                                            ADMIN_JS.refreshModel("http://127.0.0.1:8000/todo/list/manager/own/", myTodoModel, authToken)
                                         }
                                     }
                                 }
@@ -674,6 +675,7 @@ Page {
                                 model: myTodoModel
                                 clip: true
                                 delegate: Item {
+                                    //property int itemIndex: index
                                     width: myTodoListRectangle.width
                                     height: 50
                                     Rectangle {
@@ -708,8 +710,7 @@ Page {
                                                             todoDetailModel.completed = data.completed
                                                             todoDetailModel.todo_user = data.todo_user
 
-                                                            // ✅ push AFTER data is assigned
-                                                            //todoStackView.push("qrc:/Home/TodoDetailPage.qml", { stackViewRef: todoStackView })
+                                                            // push AFTER data is assigned
 
                                                             myTodoStackView.push("qrc:/Home/TodoDetailPage.qml", {
                                                                 stackViewRef: myTodoStackView,
@@ -720,12 +721,18 @@ Page {
                                                                         ADMIN_JS.deleteItem(url, authToken, function() {
                                                                             todoModel.remove(index);
                                                                             console.log("Todo deleted with ID:", item.id);
-                                                                            ADMIN_JS.refreshModel("http://127.0.0.1:8000/todo/list/", todoModel, authToken);
+                                                                            fetchAndFill("http://127.0.0.1:8000/todo/list/", todoModel);
+                                                                            fetchAndFill("http://127.0.0.1:8000/todo/list/manager/own", myTodoModel);
+
                                                                         });
-                                                                    } else {
-                                                                        console.log("Todo not found at index", index);
+                                                                    }else {
+                                                                        console.log("Item not found at index", index);
                                                                     }
+
+
+
                                                                 },
+
                                                                 onUpdateClicked: function(index, newTitle) {
                                                                     let item = todoModel.get(index);
                                                                     let url = "http://127.0.0.1:8000/todo/" + item.id + "/";
@@ -733,7 +740,6 @@ Page {
                                                                         title: newTitle,
                                                                         description: item.description,
                                                                         completed: item.completed,
-                                                                        //todo_user: item.todo_user
                                                                     };
                                                                     ADMIN_JS.updateItem(url, updatedData, authToken, function() {
                                                                         todoModel.set(index, {
@@ -741,7 +747,6 @@ Page {
                                                                             title: newTitle,
                                                                             description: item.description,
                                                                             completed: item.completed,
-                                                                            //todo_user: item.todo_user
                                                                         });
 
                                                                         console.log("Todo updated:", item.id);
@@ -749,12 +754,9 @@ Page {
                                                                 },
                                                                 onRefresh: function() {
                                                                     ADMIN_JS.refreshModel("http://127.0.0.1:8000/todo/list/", todoModel, authToken);
+                                                                    ADMIN_JS.refreshModel("http://127.0.0.1:8000/todo/list/manager/own/", myTodoModel, authToken);
                                                                 }
                                                             });
-
-
-
-
                                                         } else {
                                                             console.log("Failed to fetch todo detail:", xhr.responseText)
                                                         }
@@ -763,9 +765,6 @@ Page {
                                                 xhr.send()
                                             }
                                         }
-
-
-
                                     }
                                 }
 
@@ -787,11 +786,10 @@ Page {
                                 width: parent.width
                                 height: parent.height
                             }
-
-
                         }
 
                     }
+
                 }
 
             }

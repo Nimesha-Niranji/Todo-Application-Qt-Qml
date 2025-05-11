@@ -3,6 +3,8 @@ function admin() {
     if (loginInput.currentIndex < 0 || departmentInput.currentIndex < 0 ||
         roleInput.currentIndex < 0 || nameInput.text.trim() === "") {
         console.log("All fields must be selected/filled.")
+        messageBox.text = "All fields must be selected/filled.";
+        messageBox.open();
         return
     }
 
@@ -22,6 +24,8 @@ function admin() {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 201 || xhr.status === 200) {
                 console.log("User added successfully:", xhr.responseText)
+                messageBox.text = "User added successfully.";
+                messageBox.open();
                 nameInput.text = ""
                 ADMIN_JS.refreshModel("http://127.0.0.1:8000/todo/user/unregistered/", loginModel, authToken)
             } else {
@@ -43,6 +47,8 @@ function addItem(value, model, url, token, refreshCallback, fieldName) {
         var item = model.get(i);
         if (item[fieldName] && item[fieldName].toLowerCase() === value.toLowerCase()) {
             console.log("Item already exists:", value);
+            messageBox.text = "Item already exists.";
+            messageBox.open();
             return;
         }
     }
@@ -99,6 +105,8 @@ function deleteItem(url, authToken, successCallback) {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 204) { // No content for successful DELETE
                 console.log("Item deleted successfully");
+                messageBox.text = "Item deleted successfully.";
+                messageBox.open();
                 if (typeof successCallback === "function") {
                     successCallback();
                 }
@@ -120,6 +128,8 @@ function updateItem(url, data, authToken, successCallback) {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 200) {
                 console.log("Item updated successfully");
+                messageBox.text = "Item updated successfully.";
+                messageBox.open();
                 if (typeof successCallback === "function") {
                     successCallback();
                 }
@@ -134,6 +144,8 @@ function updateItem(url, data, authToken, successCallback) {
 function addTodo() {
     if (titleInput.text.trim() === "" || descriptionInput.text.trim() === "") {
         console.log("Title and Description must be filled.")
+        messageBox.text = "Title and Description must be filled.";
+        messageBox.open();
         return
     }
 
@@ -152,6 +164,8 @@ function addTodo() {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 201 || xhr.status === 200) {
                 console.log("Todo added successfully:", xhr.responseText)
+                messageBox.text = "Todo added successfully.";
+                messageBox.open();
                 titleInput.text = ""
                 descriptionInput.text = ""
                 completedInput.checked = false

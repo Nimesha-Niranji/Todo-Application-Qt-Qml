@@ -3,7 +3,10 @@ import QtQuick.Controls
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import QtQuick.Window
+import QtQuick.Dialogs
+
 import "Register.js" as JS
+
 
 Page {
     id: registerPage
@@ -11,6 +14,13 @@ Page {
     width: 500
     background: null
     property StackView stackViewRef
+
+    MessageDialog {
+        id: messageBox
+        title: "Notice"
+        buttons: MessageDialog.Ok
+        text: ""
+    }
 
     Rectangle{
         id: loginBox

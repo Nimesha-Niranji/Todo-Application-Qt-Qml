@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
 import "Admin.js" as ADMIN_JS
 import "qrc:/Login/Login.js" as LOGIN_JS
 
@@ -9,6 +10,14 @@ Page {
     height: 600
     width: 500
     background: null
+
+    MessageDialog {
+        id: messageBox
+        title: "Notice"
+        buttons: MessageDialog.Ok
+        text: ""
+    }
+
     property StackView stackViewRef
     property string authToken: ""
     property var todoDetailModel: ({
@@ -93,8 +102,30 @@ Page {
                 text: "Logout"
                 anchors.right: adminBox.right
                 anchors.top: adminBox.top
+
                 onClicked: {
-                    LOGIN_JS.logout(authToken, stackViewRef)
+                    logoutDialog.open()
+                }
+
+                Dialog {
+                    id: logoutDialog
+                    modal: true
+                    title: "Confirm Logout"
+                    standardButtons: Dialog.Yes | Dialog.Cancel
+                    visible: false
+                    onAccepted: {
+                        LOGIN_JS.logout(authToken, stackViewRef)
+                    }
+                    onRejected: {
+                        // Just close the dialog
+                        logoutDialog.close()
+                    }
+
+                    contentItem: Text {
+                        text: "Are you sure you want to logout?"
+                        wrapMode: Text.Wrap
+                        padding: 10
+                    }
                 }
             }
 
@@ -123,24 +154,24 @@ Page {
                     onClicked: sectionView.currentIndex = 0
                 }
 
-                Button {
-                    id: rolesButton
-                    text: "Roles";
-                    font.pixelSize: 15;
-                    background: Rectangle {
-                        color: "#4CAF50" // Green
-                        radius: 6
-                    }
+                // Button {
+                //     id: rolesButton
+                //     text: "Roles";
+                //     font.pixelSize: 15;
+                //     background: Rectangle {
+                //         color: "#4CAF50" // Green
+                //         radius: 6
+                //     }
 
-                    contentItem: Text {
-                        text: parent.text
-                        color: "white"
-                        font.pixelSize: 16
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                    onClicked: sectionView.currentIndex = 1
-                }
+                //     contentItem: Text {
+                //         text: parent.text
+                //         color: "white"
+                //         font.pixelSize: 16
+                //         horizontalAlignment: Text.AlignHCenter
+                //         verticalAlignment: Text.AlignVCenter
+                //     }
+                //     onClicked: sectionView.currentIndex = 1
+                // }
 
                 Button {
                     id: todoListButton
@@ -158,12 +189,12 @@ Page {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
-                    onClicked: sectionView.currentIndex = 2
+                    onClicked: sectionView.currentIndex = 1
                 }
 
                 Button {
                     id: userButton
-                    text: "All Users";
+                    text: "Todo Users";
                     font.pixelSize: 15;
                     background: Rectangle {
                         color: "#4CAF50" // Green
@@ -177,7 +208,7 @@ Page {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
-                    onClicked: sectionView.currentIndex = 3
+                    onClicked: sectionView.currentIndex = 2
                 }
 
                 Button {
@@ -196,7 +227,7 @@ Page {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
-                    onClicked: sectionView.currentIndex = 4
+                    onClicked: sectionView.currentIndex = 3
                 }
             }
 
@@ -264,69 +295,69 @@ Page {
                     }
                 }
 
-                Rectangle {
-                    id: aboutRoles
-                    color: "lightgreen"
-                    width: parent.width
-                    height: parent.height * 0.5
+                // Rectangle {
+                //     id: aboutRoles
+                //     color: "lightgreen"
+                //     width: parent.width
+                //     height: parent.height * 0.5
 
-                    ListAddSection {
-                        title: "Roles"
-                        placeholder: "New Role"
-                        model: roleModel
+                //     ListAddSection {
+                //         title: "Roles"
+                //         placeholder: "New Role"
+                //         model: roleModel
 
-                        onAddClicked: function(role) {
-                            ADMIN_JS.addItem(
-                                role,
-                                roleModel,
-                                "http://127.0.0.1:8000/todo/role/",
-                                authToken,
-                                function() {
-                                    ADMIN_JS.refreshModel("http://127.0.0.1:8000/todo/role/", roleModel, authToken)
-                                },
-                                "role"
-                            )
-                        }
+                //         onAddClicked: function(role) {
+                //             ADMIN_JS.addItem(
+                //                 role,
+                //                 roleModel,
+                //                 "http://127.0.0.1:8000/todo/role/",
+                //                 authToken,
+                //                 function() {
+                //                     ADMIN_JS.refreshModel("http://127.0.0.1:8000/todo/role/", roleModel, authToken)
+                //                 },
+                //                 "role"
+                //             )
+                //         }
 
-                        onRefresh: function() {
-                            ADMIN_JS.refreshModel("http://127.0.0.1:8000/todo/role/", roleModel, authToken)
-                        }
+                //         onRefresh: function() {
+                //             ADMIN_JS.refreshModel("http://127.0.0.1:8000/todo/role/", roleModel, authToken)
+                //         }
 
-                        onDeleteClicked: function(index) {
-                            if (index < 0 || index >= roleModel.count) {
-                                console.log("Invalid index:", index);
-                                return;
-                            }
+                //         onDeleteClicked: function(index) {
+                //             if (index < 0 || index >= roleModel.count) {
+                //                 console.log("Invalid index:", index);
+                //                 return;
+                //             }
 
-                            let item = roleModel.get(index);
-                            if (!item || !item.id) {
-                                console.log("Item not found or missing ID at index", index);
-                                return;
-                            }
+                //             let item = roleModel.get(index);
+                //             if (!item || !item.id) {
+                //                 console.log("Item not found or missing ID at index", index);
+                //                 return;
+                //             }
 
-                            let url = "http://127.0.0.1:8000/todo/role/" + item.id + "/";
+                //             let url = "http://127.0.0.1:8000/todo/role/" + item.id + "/";
 
-                            ADMIN_JS.deleteItem(url, authToken, function() {
-                                // ✅ Only remove from model if delete is successful
-                                roleModel.remove(index);
-                                console.log("Item deleted with ID:", item.id);
-                                // Optional refresh
-                                fetchAndFill("http://127.0.0.1:8000/todo/role/", roleModel);
-                            });
-                        }
+                //             ADMIN_JS.deleteItem(url, authToken, function() {
+                //                 // ✅ Only remove from model if delete is successful
+                //                 roleModel.remove(index);
+                //                 console.log("Item deleted with ID:", item.id);
+                //                 // Optional refresh
+                //                 fetchAndFill("http://127.0.0.1:8000/todo/role/", roleModel);
+                //             });
+                //         }
 
 
-                        onUpdateClicked: function(index, newRole) {
-                            let item = roleModel.get(index);
-                            let url = "http://127.0.0.1:8000/todo/role/" + item.id + "/";
+                //         onUpdateClicked: function(index, newRole) {
+                //             let item = roleModel.get(index);
+                //             let url = "http://127.0.0.1:8000/todo/role/" + item.id + "/";
 
-                            ADMIN_JS.updateItem(url, { role: newRole }, authToken, function() {
-                                let updatedItem = {item, role: newRole };
-                                roleModel.set(index, updatedItem);
-                            });
-                        }
-                    }
-                }
+                //             ADMIN_JS.updateItem(url, { role: newRole }, authToken, function() {
+                //                 let updatedItem = {item, role: newRole };
+                //                 roleModel.set(index, updatedItem);
+                //             });
+                //         }
+                //     }
+                // }
 
                 Rectangle {
                     id: aboutTodos

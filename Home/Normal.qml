@@ -84,11 +84,34 @@ Page {
             ListModel { id: todoModel }
 
             Button {
+                id: logoutButton
                 text: "Logout"
                 anchors.right: normalBox.right
                 anchors.top: normalBox.top
+
                 onClicked: {
-                    LOGIN_JS.logout(authToken, stackViewRef)
+                    logoutDialog.open()
+                }
+
+                Dialog {
+                    id: logoutDialog
+                    modal: true
+                    title: "Confirm Logout"
+                    standardButtons: Dialog.Yes | Dialog.Cancel
+                    visible: false
+                    onAccepted: {
+                        LOGIN_JS.logout(authToken, stackViewRef)
+                    }
+                    onRejected: {
+                        // Just close the dialog
+                        logoutDialog.close()
+                    }
+
+                    contentItem: Text {
+                        text: "Are you sure you want to logout?"
+                        wrapMode: Text.Wrap
+                        padding: 10
+                    }
                 }
             }
 
