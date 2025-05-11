@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>Login/Login.qml</file>
+        <file>Login/Login.js</file>
+        <file>Login/LoginAPI.js</file>
+        <file>Login/LoginConstant.js</file>
+        <file>Home/Admin.qml</file>
+        <file>Register/Register.qml</file>
+        <file>Register/Register.js</file>
+        <file>Home/Normal.qml</file>
+        <file>Home/Manager.qml</file>
+        <file>Home/Admin.js</file>
+        <file>Home/ListAddSection.qml</file>
+        <file>Home/Test.qml</file>
+        <file>Image/refresh-icon.png</file>
+        <file>Home/Test2.qml</file>
+        <file>Home/TodoDetailPage.qml</file>
+        <file>Home/UserDetailPage.qml</file>
+        <file>Image/delete.png</file>
+        <file>Image/update.png</file>
+    </qresource>
+</RCC>
